@@ -1,0 +1,11 @@
+What is Rest Assured?
+- It is a java library to test Rest APIs.
+
+Ho do you use it?
+- We create a request and send it to the API and get the response.
+- Then we write our tests for the response
+
+How do you create a request?
+given() -> Preparation(Token, Request Body, parameters, cookies...)
+        .when() -> To send the request(Request method, request url)
+                .then() -> Response(Response body, tests, extract data, set local or global variables)
