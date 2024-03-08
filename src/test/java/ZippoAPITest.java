@@ -1,4 +1,11 @@
+import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.builder.ResponseSpecBuilder;
+import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
+import io.restassured.specification.RequestSpecification;
+import io.restassured.specification.ResponseSpecification;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import static io.restassured.RestAssured.*;
@@ -154,5 +161,141 @@ public class ZippoAPITest {
                     .log().body()
                     .body("places", hasSize(1));
         }
+    }
+
+    @Test
+    void queryParametersTest1() {
+        given()
+                .param("page", 2)
+                .pathParam("apiName", "users")
+                .pathParam("version", "v1")
+                .log().uri()
+                .when()
+                .get("https://gorest.co.in/public/{version}/{apiName}")
+                .then()
+                .log().body()
+                .statusCode(200);
+    }
+
+    // send the same request for the pages between 1-10 and check if
+    // the page number we send from request and page number we get from response are the same
+
+    @Test
+    void queryParametersTest2() {
+        for (int i = 1; i <= 10; i++) {
+            given()
+                    .param("page", i)
+                    .pathParam("apiName", "users")
+                    .pathParam("version", "v1")
+                    .log().uri()
+                    .when()
+                    .get("https://gorest.co.in/public/{version}/{apiName}")
+                    .then()
+                    .log().body()
+                    .statusCode(200)
+                    .body("meta.pagination.page", equalTo(i));
+        }
+    }
+
+    // Write the same test with Data Provider
+    @Test(dataProvider = "parameters")
+    void queryParametersTestWithDataProvider(int pageNumber, String apiName, String version) {
+        given()
+                .param("page", pageNumber)
+                .pathParam("apiName", apiName)
+                .pathParam("version", version)
+                .log().uri()
+                .when()
+                .get("https://gorest.co.in/public/{version}/{apiName}")
+                .then()
+                .log().body()
+                .statusCode(200)
+                .body("meta.pagination.page", equalTo(pageNumber));
+    }
+
+    @DataProvider
+    public Object[][] parameters() {
+        Object[][] parametersList = {
+                {1, "users", "v1"},
+                {2, "users", "v1"},
+                {3, "users", "v1"},
+                {4, "users", "v1"},
+                {5, "users", "v1"},
+                {6, "users", "v1"},
+                {7, "users", "v1"},
+                {8, "users", "v1"},
+                {9, "users", "v1"},
+                {10, "users", "v1"},
+        };
+        return parametersList;
+    }
+
+    RequestSpecification requestSpecification;
+    ResponseSpecification responseSpecification;
+
+    @BeforeClass
+    public void setUp() {
+        baseURI = "https://gorest.co.in/public";
+        // if the request url in the request method doesn't have http part
+        // rest assured puts baseURI to the beginning of the url in the request method
+
+
+        // If we are using the same things for our requests in our tests we can put them in request specification
+        // so we don't have to write them again and again
+        requestSpecification = new RequestSpecBuilder()
+                .log(LogDetail.URI)
+                .addPathParam("apiName", "users")
+                .addPathParam("version", "v1")
+                .addParam("page", 3)
+                .build();
+
+        // If we are using the same things for our response in our tests we can put them in response specification
+        // so we don't have to write them again and again
+        responseSpecification = new ResponseSpecBuilder()
+                .log(LogDetail.BODY)
+                .expectStatusCode(200)
+                .expectContentType(ContentType.JSON)
+                .expectBody("meta.pagination.page", equalTo(3))
+                .build();
+    }
+
+    @Test
+    void baseURITest() {
+        given()
+                .param("page", 3)
+                .log().uri()
+                .when()
+                .get("/v1/users")
+                .then()
+                .log().body()
+                .statusCode(200);
+    }
+
+    @Test
+    void specificationsTest() {
+        given()
+                .spec(requestSpecification)
+                .when()
+                .get("/{version}/{apiName}")
+                .then()
+                .spec(responseSpecification);
+    }
+
+    @Test
+    void extractStringTest() {
+        String placeName = given()
+                .pathParam("country", "us")
+                .pathParam("zip", "90210")
+                .when()
+                .get("http://api.zippopotam.us/{country}/{zip}")
+                .then()
+                .log().body()
+                .extract().path("places[0].'place name'");
+
+        // with extract method our request returns a value(not an object).
+        // extract returns only one part of the response(the part that we specified in the path method) or list of that value
+        // we can assign it to a variable and use it however we want
+
+        System.out.println("placeName = " + placeName);
     }
 }
