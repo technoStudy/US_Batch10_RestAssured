@@ -65,6 +65,46 @@ public class Practice {
                 .contentType(ContentType.JSON)
                 .extract().as(ToDo.class);
 
-        Assert.assertEquals(toDo.getTitle(),"quis ut nam facilis et officia qui");
+        Assert.assertEquals(toDo.getTitle(), "quis ut nam facilis et officia qui");
+    }
+
+    /**
+     * Task 3
+     * create a get request to https://jsonplaceholder.typicode.com/todos/2
+     * expect status 200
+     * expect content type JSON
+     * expect response completed status to be false
+     */
+
+    @Test
+    void task3() {
+//        given()
+//                .when()
+//                .get("https://jsonplaceholder.typicode.com/todos/2")
+//                .then()
+//                .statusCode(200)
+//                .contentType(ContentType.JSON)
+//                .log().body()
+//                .body("completed", equalTo(false));
+
+//        boolean completed = given()
+//                .when()
+//                .get("https://jsonplaceholder.typicode.com/todos/2")
+//                .then()
+//                .statusCode(200)
+//                .contentType(ContentType.JSON)
+//                .extract().path("completed");
+//
+//        Assert.assertFalse(completed);
+
+        ToDo toDo = given()
+                .when()
+                .get("https://jsonplaceholder.typicode.com/todos/2")
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .extract().as(ToDo.class);
+
+        Assert.assertFalse(toDo.isCompleted());
     }
 }
