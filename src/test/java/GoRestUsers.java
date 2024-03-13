@@ -103,6 +103,7 @@ public class GoRestUsers {
     }
 
     User user;
+    User userFromResponse;
 
     @Test
     void createNewUserWithObject() {
@@ -115,7 +116,7 @@ public class GoRestUsers {
 //        user.setGender("female");
 //        user.setStatus("active");
 
-        given()
+        userFromResponse = given()
                 .spec(requestSpecification)
                 .body(user)
                 .when()
@@ -124,7 +125,8 @@ public class GoRestUsers {
                 .spec(responseSpecification)
                 .statusCode(201)
                 .body("email", equalTo(user.getEmail()))
-                .body("name", equalTo(user.getName()));
+                .body("name", equalTo(user.getName()))
+                .extract().as(User.class);
     }
 
     @Test(dependsOnMethods = "createNewUserWithObject")
@@ -139,6 +141,26 @@ public class GoRestUsers {
                 .post()
                 .then()
                 .spec(responseSpecification)
-                .statusCode(422);
+                .statusCode(422)
+                .body("[0].message", equalTo("has already been taken"));
+    }
+
+    /**
+     * get the user you created in createNewUserWithObject test
+     **/
+
+    @Test(dependsOnMethods = "createNewUserWithObject")
+    void getUserById() {
+
+        given()
+                .pathParam("userId",userFromResponse.getId())
+                .spec(requestSpecification)
+                .when()
+                .get("{userId}")
+                .then()
+                .spec(responseSpecification)
+                .body("id",equalTo(userFromResponse.getId()))
+                .body("name",equalTo(userFromResponse.getName()))
+                .body("email",equalTo(userFromResponse.getEmail()));
     }
 }
