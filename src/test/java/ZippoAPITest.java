@@ -1,4 +1,5 @@
 import POJOClasses.Location;
+import POJOClasses.User;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.filter.log.LogDetail;
@@ -305,8 +306,8 @@ public class ZippoAPITest {
     }
 
     @Test
-    void extractIntTest(){
-      int pageNumber = given()
+    void extractIntTest() {
+        int pageNumber = given()
                 .spec(requestSpecification)
                 .when()
                 .get("/{version}/{apiName}")
@@ -315,14 +316,14 @@ public class ZippoAPITest {
                 .extract().path("meta.pagination.page");
 
         System.out.println("pageNumber = " + pageNumber);
-        Assert.assertTrue(pageNumber==3);
+        Assert.assertTrue(pageNumber == 3);
 
         // We are not allowed to assign an int to a String(cannot assign a type to another type)
     }
 
     @Test
-    void extractListTest1(){
-       List<String> nameList = given()
+    void extractListTest1() {
+        List<String> nameList = given()
                 .spec(requestSpecification)
                 .when()
                 .get("/{version}/{apiName}")
@@ -341,8 +342,8 @@ public class ZippoAPITest {
     // and extract email values from the response and check if they contain patel_atreyee_jr@gottlieb.test
 
     @Test
-    void extractListTest2(){
-       List<String> emailList = given()
+    void extractListTest2() {
+        List<String> emailList = given()
                 .spec(requestSpecification)
                 .when()
                 .get("/{version}/{apiName}")
@@ -350,16 +351,16 @@ public class ZippoAPITest {
                 .spec(responseSpecification)
                 .extract().path("data.email");
 
-       Assert.assertTrue(emailList.contains("patel_atreyee_jr@gottlieb.test"));
+        Assert.assertTrue(emailList.contains("patel_atreyee_jr@gottlieb.test"));
     }
 
     // Send a request to https://gorest.co.in/public/v1/users?page=3
     // and check if the next link value contains page=4
 
     @Test
-    void nextLinkTest(){
+    void nextLinkTest() {
 
-       String nextLink = given()
+        String nextLink = given()
                 .spec(requestSpecification)
                 .when()
                 .get("/{version}/{apiName}")
@@ -372,8 +373,8 @@ public class ZippoAPITest {
     }
 
     @Test
-    void extractResponse(){
-       Response response = given()
+    void extractResponse() {
+        Response response = given()
                 .spec(requestSpecification)
                 .when()
                 .get("/{version}/{apiName}")
@@ -404,8 +405,8 @@ public class ZippoAPITest {
 
     // POJO -> Plain Old Java Object
     @Test
-    void extractJsonPOJO(){
-       Location location = given()
+    void extractJsonPOJO() {
+        Location location = given()
                 .pathParam("countryCode", "us")
                 .pathParam("zipCode", "90210")
                 .when()
@@ -423,24 +424,39 @@ public class ZippoAPITest {
         // We cannot extract the body partially (e.g. cannot extract place object separately)
     }
 
+    // extract.path() => We can extract only one value (String, int...) or list of that value(List<String>, List<Integer>)
+    //      String name = extract.path(data[0].name);
+    //      List<String> nameList = extract.path(data.name);
 
+    // extract.response => We can get the entire response as a Response object and get whatever we want from it.
+    //      We don't need a class structure. But if you need to use an object for your next requests it is not useful
 
+    // extract.as => We can extract the entire response body as POJO classes. But we cannot extract one part of the body separately.
+    //      We need to create a class structure for the entire body
+    //      extract.as(Location.class)
+    //      extract.as(Place.class) is not allowed
+    //      extract.as(User.class)
 
+    // extract.jsonPath() => We can extract the entire body as POJO classes as well as only one part of the body. So if you need only one part
+    //      of the body you don't need to create a class structure for the entire body. You only need class for that part of the body
+    //      extract.jsonPath().getObject(Location.class)
+    //      extract.jsonPath().getObject(Place.class)
+    //      extract.jsonPath().getObject(User.class)
 
+    @Test
+    void extractWithJsonPath() {
+        User user = given()
+                .spec(requestSpecification)
+                .when()
+                .get("/{version}/{apiName}")
+                .then()
+                .spec(responseSpecification)
+                .extract().jsonPath().getObject("data[0]", User.class);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+        System.out.println("user.getId() = " + user.getId());
+        System.out.println("user.getName() = " + user.getName());
+        System.out.println("user.getEmail() = " + user.getEmail());
+    }
 
 
 }

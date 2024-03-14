@@ -153,14 +153,83 @@ public class GoRestUsers {
     void getUserById() {
 
         given()
-                .pathParam("userId",userFromResponse.getId())
+                .pathParam("userId", userFromResponse.getId())
                 .spec(requestSpecification)
                 .when()
                 .get("{userId}")
                 .then()
                 .spec(responseSpecification)
-                .body("id",equalTo(userFromResponse.getId()))
-                .body("name",equalTo(userFromResponse.getName()))
-                .body("email",equalTo(userFromResponse.getEmail()));
+                .statusCode(200)
+                .body("id", equalTo(userFromResponse.getId()))
+                .body("name", equalTo(userFromResponse.getName()))
+                .body("email", equalTo(userFromResponse.getEmail()));
+    }
+
+    /**
+     * Update the user you created in createNewUserWithObject
+     **/
+
+    @Test(dependsOnMethods = "createNewUserWithObject")
+    void updateUser() {
+        User updatedUser = new User(randomName(), randomEmail(), "male", "active");
+
+//        userFromResponse.setName(randomName());
+//        userFromResponse.setEmail(randomEmail());
+
+        given()
+                .spec(requestSpecification)
+                .pathParam("userId", userFromResponse.getId())
+                .body(updatedUser)
+//                .body(userFromResponse)
+                .when()
+                .put("{userId}")
+                .then()
+                .spec(responseSpecification)
+                .statusCode(200)
+                .body("id", equalTo(userFromResponse.getId()))
+//                .body("email",equalTo(userFromResponse.getEmail()))
+//                .body("name",equalTo(userFromResponse.getName()));
+                .body("email", equalTo(updatedUser.getEmail()))
+                .body("name", equalTo(updatedUser.getName()));
+    }
+
+    /**
+     * Delete the user you created in createNewUserWithObject
+     **/
+    @Test(dependsOnMethods = "createNewUserWithObject")
+    void deleteUser() {
+        given()
+                .spec(requestSpecification)
+                .pathParam("userId", userFromResponse.getId())
+                .when()
+                .delete("{userId}")
+                .then()
+                .statusCode(204);
+    }
+
+    /**
+     * create delete user negative test
+     **/
+
+    @Test(dependsOnMethods = {"createNewUserWithObject", "deleteUser"})
+    void deleteUserNegativeTest() {
+        given()
+                .spec(requestSpecification)
+                .pathParam("userId", userFromResponse.getId())
+                .when()
+                .delete("{userId}")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test(dependsOnMethods = {"createNewUserWithObject", "deleteUser"})
+    void getUserByIdNegativeTest() {
+        given()
+                .pathParam("userId", userFromResponse.getId())
+                .spec(requestSpecification)
+                .when()
+                .get("{userId}")
+                .then()
+                .statusCode(404);
     }
 }
