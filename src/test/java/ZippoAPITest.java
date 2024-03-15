@@ -444,7 +444,7 @@ public class ZippoAPITest {
     //      extract.jsonPath().getObject(User.class)
 
     @Test
-    void extractWithJsonPath() {
+    void extractWithJsonPath1() {
         User user = given()
                 .spec(requestSpecification)
                 .when()
@@ -458,5 +458,57 @@ public class ZippoAPITest {
         System.out.println("user.getEmail() = " + user.getEmail());
     }
 
+    @Test
+    void extractWithJsonPath2() {
 
+        List<User> userList = given()
+                .spec(requestSpecification)
+                .when()
+                .get("/{version}/{apiName}")
+                .then()
+                .spec(responseSpecification)
+                .extract().jsonPath().getList("data", User.class);
+
+        System.out.println("userList.size() = " + userList.size());
+        System.out.println("userList.get = " + userList.get(2).getName());
+        System.out.println("userList.get(8).getId() = " + userList.get(8).getId());
+    }
+
+    @Test
+    void extractWithJsonPath3() {
+
+        String name = given()
+                .spec(requestSpecification)
+                .when()
+                .get("/{version}/{apiName}")
+                .then()
+                .spec(responseSpecification)
+                .extract().jsonPath().getString("data[1].name");
+
+        System.out.println("name = " + name);
+    }
+
+    @Test
+    void extractWithJsonPath4() {
+        Response response = given()
+                .spec(requestSpecification)
+                .when()
+                .get("/{version}/{apiName}")
+                .then()
+                .spec(responseSpecification)
+                .extract().response();
+
+        int page = response.jsonPath().getInt("meta.pagination.page");
+        System.out.println("page = " + page);
+
+        String currentLink = response.jsonPath().getString("meta.pagination.links.current");
+        System.out.println("currentLink = " + currentLink);
+
+        User user = response.jsonPath().getObject("data[2]",User.class);
+        System.out.println("user.getName() = " + user.getName());
+        
+        List<User> userList = response.jsonPath().getList("data", User.class);
+        System.out.println("userList.size() = " + userList.size());
+        System.out.println("userList.get(3).getName() = " + userList.get(3).getName());
+    }
 }
