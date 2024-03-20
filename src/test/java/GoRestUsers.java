@@ -45,7 +45,7 @@ public class GoRestUsers {
                 .build();
     }
 
-    @Test
+    @Test(priority = 1)
     void getUsersList() {
         given()
                 .when()
@@ -58,31 +58,31 @@ public class GoRestUsers {
                 .body("", hasSize(10));
     }
 
-    @Test
-    void createNewUser() {
-        given()
-                //.header("Authorization","Bearer 1352035115bdf297fee05d2110140e048fa57732bcdf430aa119426721d3f505")
-                .body("{\"name\":\"" + randomName() + "\",\"gender\":\"male\",\"email\":\"" + randomEmail() + "\",\"status\":\"active\"}")
-                //.contentType(ContentType.JSON) // To tell the API our body is in JSON format
-                .spec(requestSpecification)
-                .when()
-                .post()
-                .then()
-                //.log().body()
-                .statusCode(201)
-                //.contentType(ContentType.JSON); // To test the type of the response
-                .spec(responseSpecification);
+//    @Test
+//    void createNewUser() {
+//        given()
+//                //.header("Authorization","Bearer 1352035115bdf297fee05d2110140e048fa57732bcdf430aa119426721d3f505")
+//                .body("{\"name\":\"" + randomName() + "\",\"gender\":\"male\",\"email\":\"" + randomEmail() + "\",\"status\":\"active\"}")
+//                //.contentType(ContentType.JSON) // To tell the API our body is in JSON format
+//                .spec(requestSpecification)
+//                .when()
+//                .post()
+//                .then()
+//                //.log().body()
+//                .statusCode(201)
+//                //.contentType(ContentType.JSON); // To test the type of the response
+//                .spec(responseSpecification);
+//
+//
+////        {
+////            "name":"{{$randomFullName}}",
+////                "gender":"male",
+////                "email":"{{$randomEmail}}",
+////                "status":"active"
+////        }
+//    }
 
-
-//        {
-//            "name":"{{$randomFullName}}",
-//                "gender":"male",
-//                "email":"{{$randomEmail}}",
-//                "status":"active"
-//        }
-    }
-
-    @Test
+    @Test(priority = 2)
     void createNewUserWithMaps() {
         Map<String, String> user = new HashMap<>();
         user.put("name", randomName());
@@ -105,7 +105,7 @@ public class GoRestUsers {
     User user;
     User userFromResponse;
 
-    @Test
+    @Test(priority = 3)
     void createNewUserWithObject() {
 
         user = new User(randomName(), randomEmail(), "female", "active");
@@ -129,7 +129,7 @@ public class GoRestUsers {
                 .extract().as(User.class);
     }
 
-    @Test(dependsOnMethods = "createNewUserWithObject")
+    @Test(dependsOnMethods = "createNewUserWithObject", priority = 4)
     void createUserNegativeTest() {
 
         User userNegative = new User(randomName(), user.getEmail(), "female", "active");
@@ -149,7 +149,7 @@ public class GoRestUsers {
      * get the user you created in createNewUserWithObject test
      **/
 
-    @Test(dependsOnMethods = "createNewUserWithObject")
+    @Test(dependsOnMethods = "createNewUserWithObject", priority = 5)
     void getUserById() {
 
         given()
@@ -169,7 +169,7 @@ public class GoRestUsers {
      * Update the user you created in createNewUserWithObject
      **/
 
-    @Test(dependsOnMethods = "createNewUserWithObject")
+    @Test(dependsOnMethods = "createNewUserWithObject", priority = 6)
     void updateUser() {
         User updatedUser = new User(randomName(), randomEmail(), "male", "active");
 
@@ -196,7 +196,7 @@ public class GoRestUsers {
     /**
      * Delete the user you created in createNewUserWithObject
      **/
-    @Test(dependsOnMethods = "createNewUserWithObject")
+    @Test(dependsOnMethods = "createNewUserWithObject", priority = 7)
     void deleteUser() {
         given()
                 .spec(requestSpecification)
@@ -211,7 +211,7 @@ public class GoRestUsers {
      * create delete user negative test
      **/
 
-    @Test(dependsOnMethods = {"createNewUserWithObject", "deleteUser"})
+    @Test(dependsOnMethods = {"createNewUserWithObject", "deleteUser"}, priority = 8)
     void deleteUserNegativeTest() {
         given()
                 .spec(requestSpecification)
@@ -222,7 +222,7 @@ public class GoRestUsers {
                 .statusCode(404);
     }
 
-    @Test(dependsOnMethods = {"createNewUserWithObject", "deleteUser"})
+    @Test(dependsOnMethods = {"createNewUserWithObject", "deleteUser"}, priority = 9)
     void getUserByIdNegativeTest() {
         given()
                 .pathParam("userId", userFromResponse.getId())
