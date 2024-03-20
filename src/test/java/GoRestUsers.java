@@ -58,29 +58,29 @@ public class GoRestUsers {
                 .body("", hasSize(10));
     }
 
-//    @Test
-//    void createNewUser() {
-//        given()
-//                //.header("Authorization","Bearer 1352035115bdf297fee05d2110140e048fa57732bcdf430aa119426721d3f505")
-//                .body("{\"name\":\"" + randomName() + "\",\"gender\":\"male\",\"email\":\"" + randomEmail() + "\",\"status\":\"active\"}")
-//                //.contentType(ContentType.JSON) // To tell the API our body is in JSON format
-//                .spec(requestSpecification)
-//                .when()
-//                .post()
-//                .then()
-//                //.log().body()
-//                .statusCode(201)
-//                //.contentType(ContentType.JSON); // To test the type of the response
-//                .spec(responseSpecification);
-//
-//
-////        {
-////            "name":"{{$randomFullName}}",
-////                "gender":"male",
-////                "email":"{{$randomEmail}}",
-////                "status":"active"
-////        }
-//    }
+    @Test
+    void createNewUser() {
+        given()
+                //.header("Authorization","Bearer 1352035115bdf297fee05d2110140e048fa57732bcdf430aa119426721d3f505")
+                .body("{\"name\":\"" + randomName() + "\",\"gender\":\"male\",\"email\":\"" + randomEmail() + "\",\"status\":\"active\"}")
+                //.contentType(ContentType.JSON) // To tell the API our body is in JSON format
+                .spec(requestSpecification)
+                .when()
+                .post()
+                .then()
+                //.log().body()
+                .statusCode(201)
+                //.contentType(ContentType.JSON); // To test the type of the response
+                .spec(responseSpecification);
+
+
+//        {
+//            "name":"{{$randomFullName}}",
+//                "gender":"male",
+//                "email":"{{$randomEmail}}",
+//                "status":"active"
+//        }
+    }
 
     @Test(priority = 2)
     void createNewUserWithMaps() {
