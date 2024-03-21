@@ -50,6 +50,7 @@
                 <configuration>
                     <suiteXmlFiles>
                         <suiteXmlFile>src/test/java/GorestUsers.xml</suiteXmlFile>
+                        <suiteXmlFile>src/test/java/APIKey.xml</suiteXmlFile>
                     </suiteXmlFiles>
                 </configuration>
             </plugin>
